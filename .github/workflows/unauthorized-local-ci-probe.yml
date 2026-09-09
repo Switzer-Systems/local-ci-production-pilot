@@ -1,1 +1,19 @@
-name: Unauthorized Local CI Production Pilot Probe\n\non:\n  workflow_dispatch:\n\npermissions: {}\n\njobs:\n  unauthorized-local-ci-probe:\n    runs-on:\n      group: local-ci-production-pilot\n      labels: [self-hosted, Linux, ARM64, local-ci-production-pilot]\n    permissions: {}\n    steps:\n      - name: Fail if the production-pilot runner is acquired\n        shell: bash\n        run: |\n          echo 'SECURITY FAILURE: unauthorized workflow acquired production-pilot runner'\n          exit 97
+name: Unauthorized Local CI Production Pilot Probe
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  unauthorized-local-ci-probe:
+    runs-on:
+      group: local-ci-production-pilot
+      labels: [self-hosted, Linux, ARM64, local-ci-production-pilot]
+    permissions: {}
+    steps:
+      - name: Fail if the production-pilot runner is acquired
+        shell: bash
+        run: |
+          echo 'SECURITY FAILURE: unauthorized workflow acquired production-pilot runner'
+          exit 97
