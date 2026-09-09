@@ -1,1 +1,42 @@
-name: Trusted Local CI Production Pilot\n\non:\n  workflow_dispatch:\n    inputs:\n      expected_sha:\n        description: Commit SHA that must match the job SHA\n        required: true\n        type: string\n      confirmation:\n        description: Type RUN-PRODUCTION-PILOT to confirm this production pilot run\n        required: true\n        type: string\n\npermissions: {}\n\njobs:\n  trusted-local-ci:\n    runs-on:\n      group: local-ci-production-pilot\n      labels: [self-hosted, Linux, ARM64, local-ci-production-pilot]\n    permissions: {}\n    steps:\n      - name: Verify trusted production pilot context\n        shell: bash\n        env:\n          EXPECTED_SHA: "${{ inputs.expected_sha }}"\n          CONFIRMATION: "${{ inputs.confirmation }}"\n          RUNNER_NAME: "${{ runner.name }}"\n          RUNNER_GROUP: "${{ runner.group }}"\n          RUNNER_LABELS: "${{ join(runner.labels, ',') }}"\n        run: |\n          set -euo pipefail\n          [[ "$GITHUB_REPOSITORY" == "Switzer-Systems/local-ci-production-pilot" ]] || { echo "FAIL CLOSED: unexpected repository" >&2; exit 1; }\n          [[ "$GITHUB_REF" == "refs/heads/main" ]] || { echo "FAIL CLOSED: unexpected ref" >&2; exit 1; }\n          [[ "$GITHUB_WORKFLOW_REF" == "Switzer-Systems/local-ci-production-pilot/.github/workflows/trusted-local-ci.yml@refs/heads/main" ]] || { echo "FAIL CLOSED: unexpected workflow ref" >&2; exit 1; }\n          [[ "$GITHUB_WORKFLOW_SHA" == "$GITHUB_SHA" ]] || { echo "FAIL CLOSED: workflow SHA does not match job SHA" >&2; exit 1; }\n          [[ "$GITHUB_ACTOR" == "wswitzer" ]] || { echo "FAIL CLOSED: unexpected actor" >&2; exit 1; }\n          [[ "$GITHUB_TRIGGERING_ACTOR" == "wswitzer" ]] || { echo "FAIL CLOSED: unexpected triggering actor" >&2; exit 1; }\n          [[ "$EXPECTED_SHA" == "$GITHUB_SHA" ]] || { echo "FAIL CLOSED: expected SHA does not match job SHA" >&2; exit 1; }\n          [[ "$CONFIRMATION" == "RUN-PRODUCTION-PILOT" ]] || { echo "FAIL CLOSED: confirmation string mismatch" >&2; exit 1; }\n          printf '%s\n' "repo=$GITHUB_REPOSITORY" "ref=$GITHUB_REF" "sha=$GITHUB_SHA" "actor=$GITHUB_ACTOR" "triggering_actor=$GITHUB_TRIGGERING_ACTOR" "workflow_ref=$GITHUB_WORKFLOW_REF" "workflow_sha=$GITHUB_WORKFLOW_SHA" "runner_name=$RUNNER_NAME" "runner_group=$RUNNER_GROUP" "runner_labels=$RUNNER_LABELS"
+name: Trusted Local CI Production Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Commit SHA that must match the job SHA
+        required: true
+        type: string
+      confirmation:
+        description: Type RUN-PRODUCTION-PILOT to confirm this production pilot run
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  trusted-local-ci:
+    runs-on:
+      group: local-ci-production-pilot
+      labels: [self-hosted, Linux, ARM64, local-ci-production-pilot]
+    permissions: {}
+    steps:
+      - name: Verify trusted production pilot context
+        shell: bash
+        env:
+          EXPECTED_SHA: "${{ inputs.expected_sha }}"
+          CONFIRMATION: "${{ inputs.confirmation }}"
+          RUNNER_NAME: "${{ runner.name }}"
+          RUNNER_GROUP: "${{ runner.group }}"
+          RUNNER_LABELS: "${{ join(runner.labels, ',') }}"
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REPOSITORY" == "Switzer-Systems/local-ci-production-pilot" ]] || { echo "FAIL CLOSED: unexpected repository" >&2; exit 1; }
+          [[ "$GITHUB_REF" == "refs/heads/main" ]] || { echo "FAIL CLOSED: unexpected ref" >&2; exit 1; }
+          [[ "$GITHUB_WORKFLOW_REF" == "Switzer-Systems/local-ci-production-pilot/.github/workflows/trusted-local-ci.yml@refs/heads/main" ]] || { echo "FAIL CLOSED: unexpected workflow ref" >&2; exit 1; }
+          [[ "$GITHUB_WORKFLOW_SHA" == "$GITHUB_SHA" ]] || { echo "FAIL CLOSED: workflow SHA does not match job SHA" >&2; exit 1; }
+          [[ "$GITHUB_ACTOR" == "wswitzer" ]] || { echo "FAIL CLOSED: unexpected actor" >&2; exit 1; }
+          [[ "$GITHUB_TRIGGERING_ACTOR" == "wswitzer" ]] || { echo "FAIL CLOSED: unexpected triggering actor" >&2; exit 1; }
+          [[ "$EXPECTED_SHA" == "$GITHUB_SHA" ]] || { echo "FAIL CLOSED: expected SHA does not match job SHA" >&2; exit 1; }
+          [[ "$CONFIRMATION" == "RUN-PRODUCTION-PILOT" ]] || { echo "FAIL CLOSED: confirmation string mismatch" >&2; exit 1; }
+          printf '%s\n' "repo=$GITHUB_REPOSITORY" "ref=$GITHUB_REF" "sha=$GITHUB_SHA" "actor=$GITHUB_ACTOR" "triggering_actor=$GITHUB_TRIGGERING_ACTOR" "workflow_ref=$GITHUB_WORKFLOW_REF" "workflow_sha=$GITHUB_WORKFLOW_SHA" "runner_name=$RUNNER_NAME" "runner_group=$RUNNER_GROUP" "runner_labels=$RUNNER_LABELS"
